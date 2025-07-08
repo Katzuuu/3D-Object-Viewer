@@ -14,9 +14,11 @@
 
 GLuint VAO, VBO, shader, uniformModel;
 
+const float toRadians = M_PI / 180.0f;
+
 bool direction = true;
 float triOffset = 0.0f;
-float triMaxOffset = 0.7f;
+float triMaxOffset = 1.0f;
 float increment = 0.0005f;
 
 std::string readShader(const std::string& pathname) {
@@ -147,7 +149,9 @@ int main(void) {
         glUseProgram(shader);
 
         glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(triOffset, triOffset * -1, 0.0f));
+        //model = glm::translate(model, glm::vec3(triOffset, triOffset * -1, 0.0f));
+        //model = glm::rotate(model, triOffset * toRadians, glm::vec3(0.0f, 1.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(triOffset));
 
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
