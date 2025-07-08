@@ -2,13 +2,22 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define WIN_W 800
 #define WIN_H 600
 
-GLuint VAO, VBO, shader;
+GLuint VAO, VBO, shader, uniformModel;
+
+bool direction = true;
+float triOffset = 0.0f;
+float triMaxOffset = 0.7f;
+float increment = 0.0005f;
 
 std::string readShader(const std::string& pathname) {
     if (pathname.empty())
@@ -94,6 +103,9 @@ void compileShader() {
         glGetProgramInfoLog(shader, 512, nullptr, infoLog);
         throw std::runtime_error(std::string("Program is not valid:\n") + infoLog);
     }
+
+    uniformModel = glGetUniformLocation(shader, "model");
+    
 }
 
 int main(void) {
@@ -125,10 +137,20 @@ int main(void) {
     compileShader();
 
     while(!glfwWindowShouldClose(window)) {
+        triOffset += direction ? increment : increment * -1;
+        if(abs(triOffset) >= triMaxOffset)
+            direction = !direction;
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shader);
+
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(triOffset, triOffset * -1, 0.0f));
+
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
         glBindVertexArray(VAO);
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
