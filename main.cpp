@@ -6,20 +6,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Window.h"
+#include "Camera.h"
 #include "Shader.h"
 #include "Mesh.h"
 
 #define WIN_W 800
 #define WIN_H 600
 
-Window *window = new Window(WIN_W, WIN_H);
 std::vector<Mesh*> meshes;
 std::vector<Shader*> shaders;
-
-bool direction = true;
-float triOffset = 0.0f;
-float triMaxOffset = 360.0f;
-float increment = 0.5f;
 
 void createObjects() {
     constexpr unsigned int indices[] = {
@@ -53,19 +48,25 @@ void createShaders() {
 void cleanup() {
     for (const Mesh* mesh : meshes) delete mesh;
     for (const Shader* shader : shaders) delete shader;
-    delete window;
 }
 
 int main() {
-    window->Initialize();
+    Window window = Window(WIN_W, WIN_H);
+    window.Initialize();
 
     createObjects();
     createShaders();
 
-    while(!window->GetShouldClose()) {
-        triOffset += direction ? increment : increment * -1;
-        if(abs(triOffset) >= triMaxOffset)
-            direction = !direction;
+    Camera camera = Camera(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+         -90.0f, 0.0f,
+        0.01f, 1.0f
+    );
+
+    while(!window.GetShouldClose()) {
+        window.PollEvents();
+        camera.KeyControl(window.GetKeys());
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -74,16 +75,17 @@ int main() {
 
         // model mat
         glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(triOffset / 355, 0.0f, -2.5f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
         model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
         // projection mat
         glm::mat4 projection = glm::perspective(
             45.0f,
-            window->GetBufferWidth() / window->GetBufferHeight(),
+            window.GetBufferWidth() / window.GetBufferHeight(),
             0.1f, 100.0f
         );
 
         glUniformMatrix4fv(shaders[0]->GetModelLocation(), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(shaders[0]->GetViewLocation(), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
         glUniformMatrix4fv(shaders[0]->GetProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
 
         for (const Mesh *mesh : meshes)
@@ -91,8 +93,7 @@ int main() {
 
         glUseProgram(0);
 
-        window->SwapBuffers();
-        window->PollEvents();
+        window.SwapBuffers();
     }
 
     cleanup();

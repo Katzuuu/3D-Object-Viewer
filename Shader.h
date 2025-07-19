@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 
 class Shader {
-    GLuint shaderID, uniformProjection, uniformModel;
+    GLuint shaderID, uniformProjection, uniformModel, uniformView;
 public:
     Shader();
     ~Shader();
@@ -16,6 +16,7 @@ public:
     void CreateFromFiles(const std::string &vertexPathname, const std::string &fragmentPathname);
     GLuint GetProjectionLocation() const;
     GLuint GetModelLocation() const;
+    GLuint GetViewLocation() const;
     void UseShader() const;
     void ClearShader();
 private:
