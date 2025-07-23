@@ -19,26 +19,35 @@ void Camera::Update() {
     up = glm::normalize(glm::cross(right, front));
 }
 
-void Camera::KeyControl(const bool *keys) {
+void Camera::KeyControl(const bool *keys, const GLdouble deltaTime) {
+    const float velocity = moveSpeed * static_cast<float>(deltaTime);
+
     if (keys[GLFW_KEY_W]) {
-        position += front * moveSpeed;
+        position += front * velocity;
     }
     if (keys[GLFW_KEY_A]) {
-        position -= right * moveSpeed;
+        position -= right * velocity;
     }
     if (keys[GLFW_KEY_S]) {
-        position -= front * moveSpeed;
+        position -= front * velocity;
     }
     if (keys[GLFW_KEY_D]) {
-        position += right * moveSpeed;
+        position += right * velocity;
     }
+}
+
+void Camera::MouseControl(const GLfloat xChange, const GLfloat yChange) {
+    yaw += turnSpeed * xChange;
+    pitch += turnSpeed * -yChange;
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
+
+    Update();
 }
 
 glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(position, position + front, up);
 }
 
-Camera::~Camera() {
-
-}
+Camera::~Camera() {}
 

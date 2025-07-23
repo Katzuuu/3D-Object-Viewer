@@ -16,6 +16,8 @@ add_executable(3D_Object_Viewer
         Window.h
         Camera.cpp
         Camera.h
+        Texture.cpp
+        Texture.h
 )
 
 target_include_directories(3D_Object_Viewer PRIVATE "C:/dev/vcpkg/installed/x64-mingw-dynamic/include")

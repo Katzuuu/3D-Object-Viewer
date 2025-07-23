@@ -1,4 +1,5 @@
-#include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -51,6 +52,9 @@ void cleanup() {
 }
 
 int main() {
+    GLdouble deltaTime = 0.0f;
+    GLdouble lastTime = 0.0f;
+
     Window window = Window(WIN_W, WIN_H);
     window.Initialize();
 
@@ -61,12 +65,17 @@ int main() {
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f),
          -90.0f, 0.0f,
-        0.01f, 1.0f
+        5.0f, 0.4f
     );
 
     while(!window.GetShouldClose()) {
+        const GLdouble currentTime = glfwGetTime();
+        deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
         window.PollEvents();
-        camera.KeyControl(window.GetKeys());
+        camera.KeyControl(window.GetKeys(), deltaTime);
+        camera.MouseControl(window.GetXChange(), window.GetYChange());
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
