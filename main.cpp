@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Texture.h"
 
 #define WIN_W 800
 #define WIN_H 600
@@ -26,14 +27,14 @@ void createObjects() {
     };
 
     constexpr GLfloat vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 1.0f, 0.5f, 0.0f,
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.5f, 1.0f,
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMesh(vertices, indices, 12, 12);
+    obj1->CreateMesh(vertices, indices, std::size(vertices), std::size(indices));
     meshes.push_back(obj1);
 }
 
@@ -68,6 +69,12 @@ int main() {
         5.0f, 0.4f
     );
 
+    Texture brickTexture = Texture("../textures/brick.png");
+    brickTexture.loadTexture();
+
+    Texture dirtTexture = Texture("../textures/dirt.png");
+    dirtTexture.loadTexture();
+
     while(!window.GetShouldClose()) {
         const GLdouble currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
@@ -96,6 +103,8 @@ int main() {
         glUniformMatrix4fv(shaders[0]->GetModelLocation(), 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(shaders[0]->GetViewLocation(), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
         glUniformMatrix4fv(shaders[0]->GetProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
+
+        brickTexture.useTexture();
 
         for (const Mesh *mesh : meshes)
             mesh->RenderMesh();

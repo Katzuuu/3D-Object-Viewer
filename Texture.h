@@ -6,12 +6,13 @@
 #include <stdexcept>
 
 class Texture {
-    GLuint textureID, uniformTexture;
-    int width, height, bitDepth;
+    GLuint textureID{}, uniformTexture{};
+    int width{}, height{}, bitDepth{};
+    std::string filename;
 public:
-    Texture();
+    explicit Texture(std::string  fileName);
     ~Texture();
-    void createTexture(const std::string &pathname);
+    void loadTexture();
     GLuint GetTextureID() const;
     void useTexture() const;
     void clearTexture();

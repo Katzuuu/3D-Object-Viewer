@@ -1,12 +1,14 @@
 #include "Texture.h"
 
-Texture::Texture(): textureID(0), uniformTexture(0), width(0), height(0), bitDepth(0) {}
+#include <utility>
 
-void Texture::createTexture(const std::string &pathname) {
-    if (pathname.empty())
-        throw std::invalid_argument("Texture pathname cannot be empty");
+Texture::Texture(std::string  fileName) : filename(std::move(fileName)){};
 
-    unsigned char *imgData = stbi_load(pathname.c_str(), &width, &height, &bitDepth, 0);
+void Texture::loadTexture() {
+    if (filename.empty())
+        throw std::invalid_argument("Texture filename cannot be empty");
+
+    unsigned char *imgData = stbi_load(filename.c_str(), &width, &height, &bitDepth, 0);
     if (imgData == nullptr)
         throw std::runtime_error("Failed to load image");
 
@@ -42,6 +44,7 @@ void Texture::clearTexture() {
     width = 0;
     height = 0;
     bitDepth = 0;
+    filename = "";
 }
 
 GLuint Texture::GetTextureID() const {
